@@ -22,7 +22,8 @@ int main (int argc, char *argv[]) {
 
   if (check_args(argc, argv) == -1) return EXIT_FAILURE;
 
-  char *localhost = "127.0.0.1";
+  //char *localhost = "127.0.0.1";
+  
   short port = atoi(argv[1]);
 
   //client socket file descriptor
@@ -35,7 +36,8 @@ int main (int argc, char *argv[]) {
   // SAI must be filled with zeros
   bzero(&serv_addr, sizeof(serv_addr));
 
-  serv_addr.sin_addr.s_addr = inet_addr(localhost);
+  //serv_addr.sin_addr.s_addr = inet_addr(localhost);
+  serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
   // host to network short cuz of big endian or something idk
   serv_addr.sin_port = htons(port);
