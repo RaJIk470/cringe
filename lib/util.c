@@ -11,7 +11,7 @@ char *trim_whitespaces(char *str) {
   return str;
 }
 
-int startsWith(const char *restrict prefix, const char *restrict str) {
+int starts_with(const char *restrict prefix, const char *restrict str) {
   while(*prefix) {
     if(*prefix++ != *str++)
       return 0;

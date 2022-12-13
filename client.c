@@ -76,7 +76,7 @@ void read_user_input(void *arg) {
   
   while (fgets(message, BUFF_SIZE, stdin) > 0) {
     _write(*socketfd, message, BUFF_SIZE);
-    if (startsWith("/exit", message))
+    if (starts_with("/exit", message))
       break;
   }
 }
