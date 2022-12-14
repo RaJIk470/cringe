@@ -1,12 +1,7 @@
 #include "lib/util.h"
 #include "lib/inet_wrap.h"
+#include "structures.c"
 
-#define MAX_CHATS 1000
-
-typedef struct {
-  int id;
-  char name[32];
-} Chat;
 
 Chat *chats[MAX_CHATS];
 int chat_count = 0;

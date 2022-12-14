@@ -1,3 +1,6 @@
+#ifndef INET_WRAP_GUARD
+#define INET_WRAP_GUARD
+
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -36,3 +39,4 @@ int _write(int fd, const void *buf, size_t n);
 int _setsockopt(int fd, int level, int optname, const void *optval,
                 socklen_t optlen);
 
+#endif

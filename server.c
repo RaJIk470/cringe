@@ -91,6 +91,7 @@ int _add_client(Client *client) {
 static char hello_message[] = "Hello wish u die soon =).\n";
 
 int accept_clients(int socketfd) {
+  // load_from_database();
   SAI client_addr;
   bzero(&client_addr, sizeof(client_addr));
   socklen_t client_len = sizeof(client_addr);

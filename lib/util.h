@@ -1,3 +1,5 @@
+#ifndef UTIL_GUARD
+#define UTIL_GUARD
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -15,3 +17,5 @@ char *trim_whitespaces(char *str);
 int starts_with(const char *prefix, const char *str);
 int readln(int fd, char *buffer, size_t n);
 void remove_new_lines(char *str, int len);
+
+#endif 

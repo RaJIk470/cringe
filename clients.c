@@ -1,5 +1,6 @@
 #include "lib/inet_wrap.h"
 #include "lib/util.h"
+#include "structures.c"
 #include "chats.c"
 #include <pthread.h>
 #include <stdio.h>
@@ -8,17 +9,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#define NAME_SIZE 32
-#define MAX_CLIENTS 100
 #define BUFF_SIZE 1024
-
-typedef struct {
-  SAI addr;
-  int sockfd;
-  int uid;
-  int chat_id;
-  char name[NAME_SIZE];
-} Client;
 
 Client *clients[MAX_CLIENTS];
 void *print_clients() {
