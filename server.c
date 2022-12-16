@@ -17,16 +17,12 @@ int accept_clients(int socketfd);
 
 
 int main (int argc, char *argv[]) {
-  //ignoring sigpipe lol
   sigaction(SIGPIPE, &(struct sigaction){SIG_IGN}, NULL);
 
   if (check_args(argc, argv) == -1) return EXIT_FAILURE;
 
-  //char *localhost = "127.0.0.1";
-  
   short port = atoi(argv[1]);
 
-  //client socket file descriptor
   int socketfd;
 
   //for setsockopt
@@ -39,17 +35,15 @@ int main (int argc, char *argv[]) {
   //serv_addr.sin_addr.s_addr = inet_addr(localhost);
   serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-  // host to network short cuz of big endian or something idk
+  // host to network short cuz of network endian
   serv_addr.sin_port = htons(port);
 
   // address family ipv4
   serv_addr.sin_family = AF_INET;
 
-  // SOCK_STREAM meaning that socket uses TCP/SCTP
-  // IPPROTO_TCP meaning that socket uses TCP
   socketfd = _socket(AF_INET, SOCK_STREAM, 0);
 
-  // to reuse port and address of this serv
+  // to reuse port and address of this server
   _setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &option, sizeof(option));
 
   _bind(socketfd, (SA *)&serv_addr, sizeof(serv_addr));
@@ -88,8 +82,6 @@ int _add_client(Client *client) {
   return 0;
 }
 
-static char hello_message[] = "Hello wish u die soon =).\n";
-
 int accept_clients(int socketfd) {
   // load_from_database();
   SAI client_addr;
@@ -97,13 +89,12 @@ int accept_clients(int socketfd) {
   socklen_t client_len = sizeof(client_addr);
 
   pthread_t pid;
-  forever { // alone... ehhh
+  forever { 
     int connfd = _accept(socketfd, (SA *)&client_addr, &client_len);
     printf("Accepted\n");
 
     Client *client = create_client(&client_addr, connfd);
     if (_add_client(client) == -1) continue;
-    _write(connfd, hello_message, BUFF_SIZE); 
 
     pthread_create(&pid, NULL, &handle_client, (void *)client);
   }

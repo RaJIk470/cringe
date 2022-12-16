@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#define BUFF_SIZE 1024
+#define BUFF_SIZE 1024 
 
 Client *clients[MAX_CLIENTS];
 void *print_clients() {
@@ -112,6 +112,7 @@ int send_to_all_in_chat(char *message, Client *sender) {
 
   if (sender->chat_id == -1) {
     _write(sender->sockfd, "You're not in the chat\n", BUFF_SIZE);
+    pthread_mutex_unlock(&mutex);
     return -1;
   }
 
@@ -138,7 +139,6 @@ void cleanup(void *data) {
 
 int check_if_exit(char *buff, Client *client) {
   if (starts_with("/exit", buff)) {
-    _write(client->sockfd, "I'm Rajik!\n", BUFF_SIZE);
     _close(client->sockfd);
     remove_client(client->uid);
     return -1;
@@ -149,6 +149,12 @@ int check_if_exit(char *buff, Client *client) {
 
 int read_with_exit_check(Client *client, char *buff) {
   int res = read(client->sockfd, buff, BUFF_SIZE);
+  char *b = buff;
+  while (*b != 0) {
+    printf("%d, %c;    ", *b, *b);
+    b++;
+  }
+  printf("\n");
   if (check_if_exit(buff, client) == -1)
     pthread_cancel(pthread_self());
   return res;
@@ -163,7 +169,7 @@ void handle_logining(Client *client) {
   char name[NAME_SIZE];
 
   int res;
-  _write(client->sockfd, "/login <username> to login\n/reg <username> <password> to register\n", BUFF_SIZE);
+  _write(client->sockfd, "/login <username> to login\n", BUFF_SIZE);
   if (errno == EPIPE) return;
 
   read_with_exit_check(client, buff);
@@ -179,24 +185,9 @@ void handle_logining(Client *client) {
   if (starts_with("/login", buff)) {
     remove_new_lines(username, NAME_SIZE);
     strncpy(client->name, username, NAME_SIZE);
-    snprintf(buff, BUFF_SIZE, "Hello... ughm... not a bad name honestly... I'm just...Hello, %s\n", client->name); 
-    printf("buff: %s\n", buff);
+    snprintf(buff, BUFF_SIZE, "Hello, %s\n", client->name); 
     _write(client->sockfd, buff, BUFF_SIZE);
     if (errno == EPIPE) return;
-    // try to find in database and so on...
-    return;
-  }
-
-  char *password = strtok(NULL, " "); 
-  if (password == NULL) {
-    res = _write(client->sockfd, "Empty password. Try again\n", BUFF_SIZE);
-    if (res == -1) return;
-    handle_logining(client);
-    return;
-  }
-
-  if (starts_with("/reg", buff)) {
-    // try to save in database and so on...
     return;
   }
 
@@ -231,13 +222,15 @@ void handle_help_command(Client *client) {
 void handle_create_chat_command(Client *client, char *command) {
   char *token = strtok(command, " ");
   char *name = strtok(NULL, " ");
-  remove_new_lines(name, strlen(name));
-  
+  char message[BUFF_SIZE];
 
   if (name != NULL) {
+    remove_new_lines(name, strlen(name));
     Chat *chat = add_chat(name);
-    char message[BUFF_SIZE];
     snprintf(message, BUFF_SIZE, "Created chat with name %s and id %d\n", chat->name, chat->id);
+    writestr(client->sockfd, message);
+  } else {
+    snprintf(message, BUFF_SIZE, "Empty chat name\n");
     writestr(client->sockfd, message);
   }
 }
@@ -341,7 +334,7 @@ void handle_command(Client *client, char *command) {
     return;
   }
 
-  _write(client->sockfd, "There is no such a command lol what youre typing right now is cringe dude type /help if you don't know any command here \n", BUFF_SIZE);
+  _write(client->sockfd, "There is no such a command. /help to get commands\n", BUFF_SIZE);
 }
 
 void handle_message(Client *client, char *message) {
