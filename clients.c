@@ -132,6 +132,7 @@ void cleanup(void *data) {
   char message[BUFF_SIZE];
   if (client->chat_id != -1) {
     snprintf(message, BUFF_SIZE, "%s has leaved\n", client->name); 
+    printf("%s", message);
     send_to_all_in_chat(message, client);
   }
   remove_client(client->uid);
