@@ -59,6 +59,8 @@ int main (int argc, char *argv[]) {
 
   _close(socketfd);
 
+  destroy_win(output_win);
+  destroy_win(input_win);
   endwin();
   return 0;
 }
@@ -103,13 +105,19 @@ void read_user_input(void *arg) {
       break;
     case 13:
       form_driver(form, REQ_VALIDATION);
-      snprintf(message, BUFF_SIZE, "%s", field_buffer(input_field[0], 0));
+      snprintf(message, BUFF_SIZE, "%s\n", field_buffer(input_field[0], 0));
       char *fmsg = trim_whitespaces(message);
       wprintw(output_win, "%s\n", fmsg);
       wrefresh(output_win);
-      if (strcmp(fmsg, "/exit") != 0)
+      if (starts_with("/exit", fmsg) == 0) {
         if (strnlen(fmsg, BUFF_SIZE) > 0)
           _write(*socketfd, fmsg, BUFF_SIZE);
+      } else {
+        destroy_win(output_win); 
+        destroy_win(input_win);
+        endwin();
+        exit(0);
+      }
       set_field_buffer(input_field[0], 0, "");
       form_driver(form, REQ_VALIDATION);
       break;
