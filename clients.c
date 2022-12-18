@@ -130,11 +130,11 @@ int send_to_all_in_chat(char *message, Client *sender) {
 void cleanup(void *data) {
   Client *client = (Client *)data;
   char message[BUFF_SIZE];
+  snprintf(message, BUFF_SIZE, "%s has leaved\n", client->name); 
   if (client->chat_id != -1) {
-    snprintf(message, BUFF_SIZE, "%s has leaved\n", client->name); 
-    printf("%s", message);
     send_to_all_in_chat(message, client);
   }
+  printf("%s", message);
   remove_client(client->uid);
 }
 
